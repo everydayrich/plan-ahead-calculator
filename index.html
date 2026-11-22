@@ -653,7 +653,7 @@
   <img class="hero-logo" src="everyday_rich_stacked_logo_rgb_red.png" alt="Everyday Rich" />
   <div class="hero-eyebrow">Plan Ahead Calculator</div>
   <h1>Plan for the big stuff <em>before</em> it shows up.</h1>
-  <p>Gifts, vacations, home projects, kids' activities. Add the expenses you know are coming and we'll tell you how much to set aside each month so the money is there when you need it.</p>
+  <p>Gifts, vacations, home projects, kids' activities, and home or vehicle repairs. Enter your expenses and the calculator will tell you how much to set aside each month so the money is there when you need it.</p>
 </div>
 
 <div class="page">
@@ -663,7 +663,7 @@
     <div class="picker">
       <div class="section-label">Step 1</div>
       <div class="picker-title">Add a sinking fund</div>
-      <div class="picker-sub">Start with one of these, or build your own for anything else you save up for. You can add as many funds as you like.</div>
+      <div class="picker-sub">Start with one of these, or build your own. You can add as many funds as you like.</div>
       <div class="chips" id="chips"></div>
     </div>
 
@@ -704,7 +704,8 @@
       timing: 'My trip is {months:n} months away.',
       months: 12,
       sentences: [
-        { tpl: '{people:n} of us are going. Flights or gas cost about {cost:$} per person.', calc: v => v.people * v.cost },
+        { tpl: 'If we\'re flying, {people:n} of us need tickets at about {cost:$} each.', calc: v => v.people * v.cost },
+        { tpl: 'If we\'re driving, gas will cost about {cost:$} for the whole trip.', calc: v => v.cost },
         { tpl: 'We need lodging for {nights:n} nights at about {cost:$} a night.', calc: v => v.nights * v.cost },
         { tpl: 'Food and fun will run about {cost:$} a day for {days:n} days.', calc: v => v.cost * v.days },
       ],
@@ -740,11 +741,11 @@
       name: 'Vehicle Repairs Fund',
       chip: 'Vehicle Repairs',
       blurb: 'Tires, brakes, batteries, and the check-engine light that always comes on at the worst time.',
-      note: "<strong>Rule of thumb:</strong> set aside 1% to 2% of each vehicle's value per year for maintenance and repairs. Older or higher-mileage vehicles usually need more, so consider going higher if yours is getting up there.",
+      note: "<strong>Rule of thumb:</strong> set aside 1% to 2% of your vehicles' value per year for maintenance and repairs. Older or higher-mileage vehicles usually need more, so consider going higher if yours are getting up there.",
       timing: 'Spread this over {months:n} months.',
       months: 12,
       sentences: [
-        { tpl: "I have {cars:n} vehicles worth about {value:$} each. I'll set aside {pct:n}% of their value each year.", calc: v => v.cars * v.value * v.pct / 100, defaults: { cars: 1, pct: 2 } },
+        { tpl: "All of our vehicles together are worth about {value:$}. I'll set aside {pct:n}% of that each year.", calc: v => v.value * v.pct / 100, defaults: { pct: 2 } },
       ],
       items: [],
     },
@@ -780,7 +781,7 @@
   };
 
   // ── State ────────────────────────────────────────────────────────────
-  const STORE_KEY = 'er-sinking-funds-v1';
+  const STORE_KEY = 'er-sinking-funds-v2';
   let state = { funds: [], nextColor: 0, nextId: 1 };
 
   try {
