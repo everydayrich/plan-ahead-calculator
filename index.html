@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Plan Ahead Calculator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Lexend:wght@300;400;500;600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      /* core */
+      --bg:        #F3E6D5;
+      --surface:   #FFFFFF;
+      --surface2:  #FBF3E4;
+      --border:    #E5D3B4;
+      --text:      #1F2427;
+      --muted:     #5E7A78;
+
+      /* accent & semantic */
+      --marigold:  #EB9532;
+      --terracotta:#D84233;
+      --dusty-blue:#75A2A8;
+      --olive:     #3A3F21;
+      --salmon:    #E6A192;
+      --espresso:  #4D2C1D;
+
+      --radius-sm:   8px;
+      --radius-md:   14px;
+      --radius-lg:   20px;
+      --radius-pill: 999px;
+
+      --shadow: 0 4px 24px rgba(31,36,39,0.07);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      font-family: 'Lexend', sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+      padding: 0 0 5rem;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      text-align: center;
+      padding: 4rem 2rem 3rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(216,66,51,0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-logo {
+      max-width: 220px;
+      width: 100%;
+      height: auto;
+      margin: 0 auto 1.5rem;
+      display: block;
+      position: relative;
+    }
+
+    .hero-eyebrow {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--terracotta);
+      margin-bottom: 1rem;
+      font-weight: 700;
+    }
+
+    .hero h1 {
+      font-family: 'Lora', serif;
+      font-size: clamp(2rem, 5vw, 3.4rem);
+      font-weight: 700;
+      line-height: 1.15;
+      color: var(--text);
+      letter-spacing: -0.01em;
+      margin-bottom: 1rem;
+    }
+
+    .hero h1 em { font-style: italic; color: var(--terracotta); }
+
+    .hero p {
+      font-size: 1rem;
+      color: var(--muted);
+      font-weight: 400;
+      max-width: 560px;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
+
+    /* ── Page layout ── */
+    .page {
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 1.5rem;
+      align-items: start;
+    }
+
+    .page > * { min-width: 0; }
+
+    .section-label {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--terracotta);
+      margin-bottom: 0.9rem;
+    }
+
+    /* ── Fund picker ── */
+    .picker {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.75rem 2rem;
+      box-shadow: var(--shadow);
+      margin-bottom: 1.5rem;
+    }
+
+    .picker-title {
+      font-family: 'Lora', serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 0.35rem;
+    }
+
+    .picker-sub {
+      font-size: 0.88rem;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 1.1rem;
+    }
+
+    .chips { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.55rem 1.05rem;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--border);
+      background: var(--surface2);
+      color: var(--text);
+      font-family: 'Lexend', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s, transform 0.1s;
+    }
+
+    .chip:hover { border-color: var(--terracotta); background: #fff; }
+    .chip:active { transform: scale(0.97); }
+    .chip .plus { color: var(--terracotta); font-weight: 700; }
+
+    .chip.custom {
+      background: var(--marigold);
+      border-color: var(--marigold);
+      color: var(--espresso);
+      font-weight: 600;
+    }
+    .chip.custom .plus { color: var(--espresso); }
+    .chip.custom:hover { background: #d6842c; border-color: #d6842c; }
+
+    /* ── Fund cards ── */
+    .funds { display: flex; flex-direction: column; gap: 1.25rem; }
+
+    .fund {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      animation: rise 0.45s ease both;
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .fund-head {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1.4rem 2rem 0.4rem;
+    }
+
+    .fund-dot {
+      width: 12px; height: 12px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .fund-name {
+      flex: 1;
+      min-width: 0;
+      font-family: 'Lora', serif;
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: var(--text);
+      border: 1px solid transparent;
+      border-radius: var(--radius-sm);
+      background: transparent;
+      padding: 0.2rem 0.45rem;
+      margin-left: -0.45rem;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .fund-name:hover { border-color: var(--border); }
+    .fund-name:focus { outline: none; border-color: var(--terracotta); background: var(--surface2); }
+
+    .remove-btn {
+      background: none;
+      border: none;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+      cursor: pointer;
+      padding: 0.35rem 0.5rem;
+      border-radius: var(--radius-sm);
+    }
+    .remove-btn:hover { color: var(--terracotta); background: var(--surface2); }
+
+    .fund-blurb {
+      font-size: 0.84rem;
+      color: var(--muted);
+      line-height: 1.6;
+      padding: 0 2rem 1rem 2rem;
+      margin-left: calc(12px + 0.75rem);
+    }
+
+    .fund-body { padding: 0 2rem 1.25rem; }
+
+    .fund-note {
+      margin: -0.25rem 2rem 1rem;
+      padding: 0.8rem 1rem;
+      background: rgba(117,162,168,0.12);
+      border-left: 3px solid var(--dusty-blue);
+      border-radius: var(--radius-sm);
+      font-size: 0.8rem;
+      line-height: 1.6;
+      color: var(--text);
+    }
+    .fund-note strong { font-weight: 600; }
+
+    /* sentence lines */
+    .line {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.85rem 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .sentence {
+      font-size: 0.95rem;
+      line-height: 2.3;
+      color: var(--text);
+    }
+
+    .line-total {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--muted);
+      white-space: nowrap;
+      text-align: right;
+      min-width: 5.5rem;
+    }
+
+    /* inline inputs */
+    .inl {
+      display: inline-block;
+      width: 4.2rem;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0.3rem 0.5rem;
+      font-family: 'Lexend', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--terracotta);
+      text-align: center;
+      line-height: 1.4;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      -moz-appearance: textfield;
+    }
+    .inl::-webkit-outer-spin-button,
+    .inl::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    .inl::placeholder { color: #cbb896; font-weight: 400; }
+    .inl:focus {
+      outline: none;
+      border-color: var(--terracotta);
+      box-shadow: 0 0 0 3px rgba(216,66,51,0.1);
+    }
+
+    .money { position: relative; display: inline-block; }
+    .money .cur {
+      position: absolute;
+      left: 0.5rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.88rem;
+      color: var(--muted);
+      pointer-events: none;
+    }
+    .money .inl { width: 6rem; padding-left: 1.2rem; }
+
+    /* custom item rows */
+    .item {
+      display: grid;
+      grid-template-columns: 1fr auto auto auto auto;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.7rem 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .item-label {
+      min-width: 0;
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0.42rem 0.7rem;
+      font-family: 'Lexend', sans-serif;
+      font-size: 0.9rem;
+      color: var(--text);
+    }
+    .item-label::placeholder { color: #cbb896; }
+    .item-label:focus { outline: none; border-color: var(--terracotta); box-shadow: 0 0 0 3px rgba(216,66,51,0.1); }
+
+    .times {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.78rem;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .x-btn {
+      width: 1.8rem; height: 1.8rem;
+      border-radius: 50%;
+      border: none;
+      background: none;
+      color: var(--muted);
+      font-size: 1.05rem;
+      cursor: pointer;
+      line-height: 1;
+    }
+    .x-btn:hover { background: var(--surface2); color: var(--terracotta); }
+
+    .item-head {
+      display: grid;
+      grid-template-columns: 1fr auto auto auto auto;
+      gap: 0.5rem;
+      padding-top: 0.9rem;
+      padding-bottom: 0.35rem;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.64rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+    }
+
+    .add-item {
+      margin-top: 0.6rem;
+      background: none;
+      border: 1px dashed var(--border);
+      border-radius: var(--radius-pill);
+      padding: 0.5rem 1rem;
+      font-family: 'Lexend', sans-serif;
+      font-size: 0.84rem;
+      font-weight: 500;
+      color: var(--terracotta);
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .add-item:hover { border-color: var(--terracotta); background: var(--surface2); }
+
+    /* fund settings + result strip */
+    .fund-settings {
+      background: var(--surface2);
+      border-top: 1px solid var(--border);
+      padding: 1rem 2rem;
+    }
+
+    .fund-settings .sentence { font-size: 0.9rem; color: var(--text); }
+    .fund-settings .inl { background: #fff; }
+
+    .fund-result {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem 1rem;
+      padding: 1rem 2rem 1.2rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .fund-goal {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .fund-goal strong { color: var(--text); font-weight: 600; }
+
+    .fund-monthly {
+      font-family: 'Lora', serif;
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--terracotta);
+      line-height: 1;
+      white-space: nowrap;
+    }
+    .fund-monthly span {
+      font-family: 'Lexend', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 400;
+      color: var(--muted);
+      margin-left: 0.2rem;
+    }
+
+    @media (max-width: 560px) {
+      .fund-head, .fund-body, .fund-settings, .fund-result { padding-left: 1.25rem; padding-right: 1.25rem; }
+      .fund-blurb { padding: 0 1.25rem 1rem; margin-left: 0; }
+      .fund-note { margin-left: 1.25rem; margin-right: 1.25rem; }
+      .picker { padding: 1.5rem 1.25rem; }
+      .fund-name { font-size: 1.1rem; }
+      .line { flex-direction: column; align-items: flex-start; gap: 0.2rem; }
+      .line-total { text-align: left; }
+      .item { grid-template-columns: auto auto auto 1fr; }
+      .item .item-label { grid-column: 1 / -1; }
+      .item .x-btn { justify-self: end; }
+      .item-head { display: none; }
+    }
+
+    /* ── Summary panel ── */
+    .summary {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      box-shadow: var(--shadow);
+    }
+
+    .summary-inner { max-width: 480px; margin: 0 auto; }
+
+    .sum-eyebrow {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.5rem;
+      text-align: center;
+    }
+
+    .sum-total {
+      font-family: 'Lora', serif;
+      font-size: 3rem;
+      font-weight: 700;
+      color: var(--terracotta);
+      text-align: center;
+      line-height: 1;
+    }
+
+    .sum-total-sub {
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-top: 0.45rem;
+    }
+
+    .sum-figs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      margin: 1.5rem 0 1.25rem;
+    }
+
+    .sum-fig {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 0.9rem 0.75rem;
+      text-align: center;
+    }
+
+    .fig-label {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.64rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.4rem;
+    }
+
+    .fig-value {
+      font-family: 'Lora', serif;
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1;
+    }
+
+    .pay-q {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 1.5rem;
+      font-size: 0.88rem;
+      color: var(--text);
+    }
+
+    .pay-select {
+      appearance: none;
+      -webkit-appearance: none;
+      background: var(--surface2) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23D84233' stroke-width='1.6'/%3E%3C/svg%3E") no-repeat right 0.75rem center;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-pill);
+      padding: 0.45rem 2rem 0.45rem 0.9rem;
+      font-family: 'Lexend', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: var(--terracotta);
+      cursor: pointer;
+    }
+    .pay-select:focus { outline: none; border-color: var(--terracotta); box-shadow: 0 0 0 3px rgba(216,66,51,0.1); }
+    .pay-select.unset { color: var(--muted); font-weight: 400; }
+
+    .fig-value.prompt {
+      font-family: 'Lexend', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 400;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+
+    .sum-figs.with-q { margin-top: 0.9rem; }
+
+    .bar {
+      display: flex;
+      height: 12px;
+      border-radius: var(--radius-pill);
+      overflow: hidden;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      margin-bottom: 1rem;
+    }
+    .bar div { height: 100%; transition: width 0.3s ease; }
+    .bar div + div { border-left: 2px solid #fff; }
+
+    .sum-rows { display: flex; flex-direction: column; }
+
+    .sum-row {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.6rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.85rem;
+    }
+    .sum-row:last-child { border-bottom: none; }
+    .sum-row .dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+    .sum-row .nm { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .sum-row .nm small { display: block; font-size: 0.72rem; color: var(--muted); }
+    .sum-row .val { font-weight: 600; white-space: nowrap; text-align: right; }
+    .sum-row .val small { display: block; font-size: 0.72rem; font-weight: 400; color: var(--muted); margin-top: 0.1rem; }
+
+    .sum-empty {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.6;
+      padding: 0.5rem 0 0.25rem;
+    }
+    .sum-empty .icon { font-size: 2rem; color: var(--terracotta); opacity: 0.45; margin-bottom: 0.6rem; }
+
+    .sum-tip {
+      margin-top: 1.25rem;
+      padding-top: 1.1rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .sum-tip strong { color: var(--text); font-weight: 600; }
+
+    .reset-btn {
+      display: block;
+      margin: 1rem auto 0;
+      background: none;
+      border: none;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+      cursor: pointer;
+      padding: 0.35rem 0.6rem;
+      border-radius: var(--radius-sm);
+    }
+    .reset-btn:hover { color: var(--terracotta); background: var(--surface2); }
+
+    /* ── Page footer disclaimer ── */
+    .page-disclaimer {
+      max-width: 820px;
+      margin: 3rem auto 0;
+      padding: 1.5rem 1.5rem 0;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.72rem;
+      font-style: italic;
+      color: var(--muted);
+      font-weight: 400;
+      line-height: 1.6;
+      text-align: center;
+      border-top: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+
+<div class="hero">
+  <img class="hero-logo" src="everyday_rich_stacked_logo_rgb_red.png" alt="Everyday Rich" />
+  <div class="hero-eyebrow">Plan Ahead Calculator</div>
+  <h1>Plan for the big stuff <em>before</em> it shows up.</h1>
+  <p>Gifts, vacations, home projects, kids' activities. Add the expenses you know are coming and we'll tell you how much to set aside each month so the money is there when you need it.</p>
+</div>
+
+<div class="page">
+
+  <!-- LEFT: Funds -->
+  <div>
+    <div class="picker">
+      <div class="section-label">Step 1</div>
+      <div class="picker-title">Add a sinking fund</div>
+      <div class="picker-sub">Start with one of these, or build your own for anything else you save up for. You can add as many funds as you like.</div>
+      <div class="chips" id="chips"></div>
+    </div>
+
+    <div class="funds" id="funds"></div>
+  </div>
+
+  <!-- RIGHT: Summary -->
+  <aside class="summary" id="summary"></aside>
+
+</div>
+
+<p class="page-disclaimer">This calculator is for educational purposes only and does not constitute financial advice. Individual financial situations vary, and readers should consider consulting a qualified financial professional before making major financial decisions.</p>
+
+<script>
+  // ── Fund colors (from the Everyday Rich palette) ─────────────────────
+  const COLORS = ['#D84233', '#EB9532', '#75A2A8', '#3A3F21', '#E6A192', '#4D2C1D'];
+
+  // ── Fund templates ───────────────────────────────────────────────────
+  // Sentence tokens: {key:n} = number, {key:$} = dollars
+  const TEMPLATES = {
+    gifts: {
+      name: 'Gift Fund',
+      chip: 'Gift Fund',
+      blurb: 'Birthdays, holidays, and all the "we should bring something" moments in between.',
+      timing: 'Spread this over {months:n} months.',
+      months: 12,
+      sentences: [
+        { tpl: 'I buy birthday gifts for {people:n} people, spending about {cost:$} each.', calc: v => v.people * v.cost },
+        { tpl: 'I buy holiday gifts for {people:n} people, spending about {cost:$} each.', calc: v => v.people * v.cost },
+        { tpl: 'I also give about {count:n} other gifts a year (weddings, showers, teachers) at {cost:$} each.', calc: v => v.count * v.cost },
+      ],
+      items: [],
+    },
+    vacation: {
+      name: 'Vacation Fund',
+      chip: 'Vacation',
+      blurb: 'Getting there, a place to stay, and enough left over to actually enjoy it.',
+      timing: 'My trip is {months:n} months away.',
+      months: 12,
+      sentences: [
+        { tpl: '{people:n} of us are going. Flights or gas cost about {cost:$} per person.', calc: v => v.people * v.cost },
+        { tpl: 'We need lodging for {nights:n} nights at about {cost:$} a night.', calc: v => v.nights * v.cost },
+        { tpl: 'Food and fun will run about {cost:$} a day for {days:n} days.', calc: v => v.cost * v.days },
+      ],
+      items: [],
+    },
+    home: {
+      name: 'Home Improvement Fund',
+      chip: 'Home Improvement',
+      blurb: 'List the pieces of the project. A cushion helps cover the surprises that always come up.',
+      timing: 'I want to start in {months:n} months.',
+      months: 12,
+      cushion: 10,
+      sentences: [],
+      items: [
+        { label: 'Materials and supplies', qty: 1, cost: '' },
+        { label: 'Labor or contractor', qty: 1, cost: '' },
+        { label: 'Tools, permits, delivery', qty: 1, cost: '' },
+      ],
+    },
+    homerepair: {
+      name: 'Home Repairs Fund',
+      chip: 'Home Repairs',
+      blurb: 'For the leaky roof, the dead water heater, and the repairs no one plans for.',
+      note: "<strong>Rule of thumb:</strong> set aside 1% to 4% of your home's value each year for maintenance and repairs. Lean toward 1% for homes under 10 years old and closer to 4% for homes over 30 years old or in harsh climates.",
+      timing: 'Spread this over {months:n} months.',
+      months: 12,
+      sentences: [
+        { tpl: "My home is worth about {value:$}. I'll set aside {pct:n}% of its value each year.", calc: v => v.value * v.pct / 100, defaults: { pct: 1 } },
+      ],
+      items: [],
+    },
+    vehicle: {
+      name: 'Vehicle Repairs Fund',
+      chip: 'Vehicle Repairs',
+      blurb: 'Tires, brakes, batteries, and the check-engine light that always comes on at the worst time.',
+      note: "<strong>Rule of thumb:</strong> set aside 1% to 2% of each vehicle's value per year for maintenance and repairs. Older or higher-mileage vehicles usually need more, so consider going higher if yours is getting up there.",
+      timing: 'Spread this over {months:n} months.',
+      months: 12,
+      sentences: [
+        { tpl: "I have {cars:n} vehicles worth about {value:$} each. I'll set aside {pct:n}% of their value each year.", calc: v => v.cars * v.value * v.pct / 100, defaults: { cars: 1, pct: 2 } },
+      ],
+      items: [],
+    },
+    kids: {
+      name: "Kids' Activities Fund",
+      chip: "Kids' Activities",
+      blurb: 'Sports, lessons, camps, and clubs, including registration fees, gear, and uniforms.',
+      timing: 'Spread this over {months:n} months.',
+      months: 12,
+      sentences: [
+        { tpl: 'I have {kids:n} kids. They each do {acts:n} activities per year, costing about {cost:$} each on average.', calc: v => v.kids * v.acts * v.cost },
+      ],
+      items: [],
+    },
+    custom: {
+      name: '',
+      placeholder: 'Name your fund (e.g. Car Repairs)',
+      chip: 'Build your own',
+      blurb: 'Add each expense, how many times it happens, and what it usually costs.',
+      timing: 'Spread this over {months:n} months.',
+      months: 12,
+      sentences: [],
+      items: [ { label: '', qty: 1, cost: '' } ],
+    },
+  };
+
+  // ── Pay schedules ────────────────────────────────────────────────────
+  const PAY = {
+    weekly:      { label: 'Every week',      per: 52, box: 'Per weekly paycheck' },
+    biweekly:    { label: 'Every two weeks', per: 26, box: 'Per biweekly paycheck' },
+    semimonthly: { label: 'Twice a month',   per: 24, box: 'Per paycheck (2x/mo)' },
+    monthly:     { label: 'Once a month',    per: 12, box: 'Per monthly paycheck' },
+  };
+
+  // ── State ────────────────────────────────────────────────────────────
+  const STORE_KEY = 'er-sinking-funds-v1';
+  let state = { funds: [], nextColor: 0, nextId: 1 };
+
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORE_KEY));
+    if (saved && Array.isArray(saved.funds)) state = saved;
+  } catch (e) { /* storage unavailable; start fresh */ }
+
+  function save() {
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (e) {}
+  }
+
+  // ── Helpers ──────────────────────────────────────────────────────────
+  const num = v => { const n = parseFloat(v); return isFinite(n) && n > 0 ? n : 0; };
+  const fmt = n => '$' + Math.round(n).toLocaleString();
+  // Monthly amounts round UP to the next dollar so savers never come up short
+  const fmtCents = n => '$' + Math.max(0, Math.ceil(n - 1e-9)).toLocaleString();
+
+  function el(tag, cls, text) {
+    const e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  }
+
+  // Build a sentence with inline inputs. getVal/setVal read & write the backing store.
+  function buildSentence(tpl, getVal, setVal) {
+    const wrap = el('span', 'sentence');
+    const re = /\{(\w+):(n|\$)\}/g;
+    let last = 0, m;
+    while ((m = re.exec(tpl))) {
+      if (m.index > last) wrap.appendChild(document.createTextNode(tpl.slice(last, m.index)));
+      const key = m[1], kind = m[2];
+      const input = el('input', 'inl');
+      input.type = 'number';
+      input.min = '0';
+      input.step = 'any';
+      input.inputMode = 'decimal';
+      input.placeholder = (kind === '$' || key === 'cushion' || key === 'saved') ? '0' : '#';
+      input.setAttribute('aria-label', key);
+      const v = getVal(key);
+      input.value = (v === '' || v == null) ? '' : v;
+      input.addEventListener('input', () => { setVal(key, input.value); update(); });
+      if (kind === '$') {
+        const money = el('span', 'money');
+        money.appendChild(el('span', 'cur', '$'));
+        money.appendChild(input);
+        wrap.appendChild(money);
+      } else {
+        wrap.appendChild(input);
+      }
+      last = re.lastIndex;
+    }
+    if (last < tpl.length) wrap.appendChild(document.createTextNode(tpl.slice(last)));
+    return wrap;
+  }
+
+  // ── Calculations ─────────────────────────────────────────────────────
+  function sentenceTotal(fund, i) {
+    const t = TEMPLATES[fund.type].sentences[i];
+    const raw = fund.sentences[i] || {};
+    const v = {};
+    (t.tpl.match(/\{(\w+):/g) || []).forEach(k => { const key = k.slice(1, -1); v[key] = num(raw[key]); });
+    return t.calc(v);
+  }
+
+  function fundCalc(fund) {
+    let base = 0;
+    TEMPLATES[fund.type].sentences.forEach((_, i) => base += sentenceTotal(fund, i));
+    fund.items.forEach(it => base += num(it.qty) * num(it.cost));
+    const goal = base * (1 + num(fund.cushion) / 100);
+    const need = Math.max(0, goal - num(fund.saved));
+    const months = num(fund.months);
+    const monthly = months > 0 ? need / months : 0;
+    return { base, goal, need, months, monthly };
+  }
+
+  // ── Actions ──────────────────────────────────────────────────────────
+  function addFund(type) {
+    const t = TEMPLATES[type];
+    const fund = {
+      id: state.nextId++,
+      type,
+      name: t.name,
+      color: COLORS[state.nextColor++ % COLORS.length],
+      months: t.months,
+      saved: '',
+      cushion: t.cushion || '',
+      sentences: t.sentences.map(x => ({ ...(x.defaults || {}) })),
+      items: t.items.map(it => ({ ...it })),
+    };
+    state.funds.push(fund);
+    save();
+    renderFunds();
+    update();
+    const card = document.getElementById('fund-' + fund.id);
+    if (card) {
+      card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      const first = card.querySelector(type === 'custom' ? '.fund-name' : '.fund-body input');
+      if (first) setTimeout(() => first.focus({ preventScroll: true }), 350);
+    }
+  }
+
+  function removeFund(id) {
+    state.funds = state.funds.filter(f => f.id !== id);
+    save();
+    renderFunds();
+    update();
+  }
+
+  // ── Rendering ────────────────────────────────────────────────────────
+  function renderChips() {
+    const chips = document.getElementById('chips');
+    Object.entries(TEMPLATES).forEach(([type, t]) => {
+      const b = el('button', 'chip' + (type === 'custom' ? ' custom' : ''));
+      b.type = 'button';
+      b.appendChild(el('span', 'plus', '+'));
+      b.appendChild(document.createTextNode(t.chip));
+      b.addEventListener('click', () => addFund(type));
+      chips.appendChild(b);
+    });
+  }
+
+  function renderItems(fund, container) {
+    container.innerHTML = '';
+    if (fund.items.length) {
+      const head = el('div', 'item-head');
+      head.appendChild(el('span', 'h-label', 'Expense'));
+      head.appendChild(el('span', 'h-qty', 'How many'));
+      head.appendChild(el('span', '', ''));
+      head.appendChild(el('span', '', 'Cost each'));
+      head.appendChild(el('span', '', ''));
+      container.appendChild(head);
+    }
+    fund.items.forEach((it, idx) => {
+      const row = el('div', 'item');
+
+      const label = el('input', 'item-label');
+      label.type = 'text';
+      label.placeholder = 'What is it? (e.g. Oil changes)';
+      label.value = it.label || '';
+      label.setAttribute('aria-label', 'Expense name');
+      label.addEventListener('input', () => { it.label = label.value; save(); });
+
+      const qty = el('input', 'inl');
+      qty.type = 'number'; qty.min = '0'; qty.step = 'any'; qty.inputMode = 'decimal';
+      qty.placeholder = '#';
+      qty.value = it.qty === '' || it.qty == null ? '' : it.qty;
+      qty.setAttribute('aria-label', 'How many');
+      qty.addEventListener('input', () => { it.qty = qty.value; update(); });
+
+      const money = el('span', 'money');
+      money.appendChild(el('span', 'cur', '$'));
+      const cost = el('input', 'inl');
+      cost.type = 'number'; cost.min = '0'; cost.step = 'any'; cost.inputMode = 'decimal';
+      cost.placeholder = '0';
+      cost.value = it.cost === '' || it.cost == null ? '' : it.cost;
+      cost.setAttribute('aria-label', 'Cost each');
+      cost.addEventListener('input', () => { it.cost = cost.value; update(); });
+      money.appendChild(cost);
+
+      const x = el('button', 'x-btn', '×');
+      x.type = 'button';
+      x.setAttribute('aria-label', 'Remove expense');
+      x.addEventListener('click', () => {
+        fund.items.splice(idx, 1);
+        save();
+        renderItems(fund, container);
+        update();
+      });
+
+      row.appendChild(label);
+      row.appendChild(qty);
+      row.appendChild(el('span', 'times', '×'));
+      row.appendChild(money);
+      row.appendChild(x);
+      container.appendChild(row);
+    });
+  }
+
+  function renderFunds() {
+    const wrap = document.getElementById('funds');
+    wrap.innerHTML = '';
+
+    state.funds.forEach(fund => {
+      const t = TEMPLATES[fund.type];
+      const card = el('div', 'fund');
+      card.id = 'fund-' + fund.id;
+
+      // header
+      const head = el('div', 'fund-head');
+      const dot = el('span', 'fund-dot');
+      dot.style.background = fund.color;
+      const name = el('input', 'fund-name');
+      name.type = 'text';
+      name.value = fund.name;
+      name.placeholder = t.placeholder || 'Name this fund';
+      name.setAttribute('aria-label', 'Fund name');
+      name.addEventListener('input', () => { fund.name = name.value; update(); });
+      const rm = el('button', 'remove-btn', 'Remove');
+      rm.type = 'button';
+      rm.addEventListener('click', () => removeFund(fund.id));
+      head.append(dot, name, rm);
+      card.appendChild(head);
+      card.appendChild(el('div', 'fund-blurb', t.blurb));
+      if (t.note) {
+        const note = el('div', 'fund-note');
+        note.innerHTML = t.note; // static template text only
+        card.appendChild(note);
+      }
+
+      // body
+      const body = el('div', 'fund-body');
+      t.sentences.forEach((s, i) => {
+        const line = el('div', 'line');
+        line.appendChild(buildSentence(s.tpl,
+          k => fund.sentences[i][k],
+          (k, v) => { fund.sentences[i][k] = v; }));
+        const lt = el('span', 'line-total');
+        lt.dataset.fund = fund.id;
+        lt.dataset.line = i;
+        line.appendChild(lt);
+        body.appendChild(line);
+      });
+
+      const items = el('div');
+      renderItems(fund, items);
+      body.appendChild(items);
+
+      const add = el('button', 'add-item', fund.items.length || fund.type === 'custom' ? '+ Add an expense' : '+ Add something else to this fund');
+      add.type = 'button';
+      add.addEventListener('click', () => {
+        fund.items.push({ label: '', qty: 1, cost: '' });
+        save();
+        renderItems(fund, items);
+        add.textContent = '+ Add an expense';
+        const labels = items.querySelectorAll('.item-label');
+        if (labels.length) labels[labels.length - 1].focus();
+        update();
+      });
+      body.appendChild(add);
+      card.appendChild(body);
+
+      // settings
+      const settings = el('div', 'fund-settings');
+      const settingsTpl = t.timing + " I've already saved {saved:$}. Add a {cushion:n}% cushion for surprises.";
+      settings.appendChild(buildSentence(settingsTpl,
+        k => fund[k],
+        (k, v) => { fund[k] = v; }));
+      card.appendChild(settings);
+
+      // result strip
+      const res = el('div', 'fund-result');
+      const goal = el('div', 'fund-goal');
+      goal.dataset.goal = fund.id;
+      const monthly = el('div', 'fund-monthly');
+      monthly.dataset.monthly = fund.id;
+      res.append(goal, monthly);
+      card.appendChild(res);
+
+      wrap.appendChild(card);
+    });
+  }
+
+  function update() {
+    save();
+    let totalMonthly = 0, totalGoal = 0;
+    const rows = [];
+
+    state.funds.forEach(fund => {
+      const c = fundCalc(fund);
+      totalMonthly += c.monthly;
+      totalGoal += c.goal;
+      rows.push({ fund, c });
+
+      // per-line totals
+      TEMPLATES[fund.type].sentences.forEach((_, i) => {
+        const lt = document.querySelector(`.line-total[data-fund="${fund.id}"][data-line="${i}"]`);
+        if (lt) { const v = sentenceTotal(fund, i); lt.textContent = v > 0 ? '= ' + fmt(v) : ''; }
+      });
+
+      const g = document.querySelector(`[data-goal="${fund.id}"]`);
+      if (g) {
+        g.innerHTML = '';
+        if (c.goal > 0) {
+          g.append('Goal ');
+          g.appendChild(el('strong', '', fmt(c.goal)));
+          if (num(fund.saved) > 0) {
+            g.append(' · ');
+            g.appendChild(el('strong', '', fmt(c.need)));
+            g.append(' still to save');
+          }
+          if (c.months > 0) g.append(` over ${c.months} month${c.months === 1 ? '' : 's'}`);
+          else g.append(' · add how many months you have');
+        } else {
+          g.textContent = 'Fill in the blanks above to see your monthly amount.';
+        }
+      }
+      const m = document.querySelector(`[data-monthly="${fund.id}"]`);
+      if (m) {
+        m.textContent = fmtCents(c.monthly);
+        m.appendChild(el('span', '', '/ month'));
+      }
+    });
+
+    renderSummary(rows, totalMonthly, totalGoal);
+  }
+
+  function renderSummary(rows, totalMonthly, totalGoal) {
+    const outer = document.getElementById('summary');
+    outer.innerHTML = '';
+    const s = el('div', 'summary-inner');
+    outer.appendChild(s);
+
+    s.appendChild(el('div', 'sum-eyebrow', 'Set aside each month'));
+    s.appendChild(el('div', 'sum-total', fmtCents(totalMonthly)));
+
+    if (!rows.length) {
+      s.appendChild(el('div', 'sum-total-sub', 'across your sinking funds'));
+      const empty = el('div', 'sum-empty');
+      empty.style.marginTop = '1.5rem';
+      empty.appendChild(el('div', 'icon', '◎'));
+      empty.appendChild(el('p', '', 'Add a fund above to get started. Your monthly total will build here as you go.'));
+      s.appendChild(empty);
+      return;
+    }
+
+    s.appendChild(el('div', 'sum-total-sub', `across ${rows.length} sinking fund${rows.length === 1 ? '' : 's'}`));
+
+    // pay schedule question
+    const q = el('label', 'pay-q');
+    q.appendChild(el('span', '', 'How often do you get paid?'));
+    const sel = el('select', 'pay-select' + (PAY[state.payFreq] ? '' : ' unset'));
+    const ph = el('option', '', 'Choose one');
+    ph.value = ''; ph.disabled = true;
+    sel.appendChild(ph);
+    Object.entries(PAY).forEach(([k, v]) => {
+      const o = el('option', '', v.label);
+      o.value = k;
+      sel.appendChild(o);
+    });
+    sel.value = PAY[state.payFreq] ? state.payFreq : '';
+    sel.addEventListener('change', () => { state.payFreq = sel.value; update(); });
+    q.appendChild(sel);
+    s.appendChild(q);
+
+    const figs = el('div', 'sum-figs with-q');
+    const f1 = el('div', 'sum-fig');
+    const pay = PAY[state.payFreq];
+    if (pay) {
+      f1.append(el('div', 'fig-label', pay.box), el('div', 'fig-value', fmtCents(totalMonthly * 12 / pay.per)));
+    } else {
+      f1.append(el('div', 'fig-label', 'Per paycheck'), el('div', 'fig-value prompt', 'Choose your pay schedule above'));
+    }
+    const f2 = el('div', 'sum-fig');
+    f2.append(el('div', 'fig-label', 'Total goals'), el('div', 'fig-value', fmt(totalGoal)));
+    figs.append(f1, f2);
+    s.appendChild(figs);
+
+    if (totalMonthly > 0) {
+      const bar = el('div', 'bar');
+      rows.forEach(({ fund, c }) => {
+        if (c.monthly <= 0) return;
+        const seg = el('div');
+        seg.style.width = (c.monthly / totalMonthly * 100) + '%';
+        seg.style.background = fund.color;
+        seg.title = (fund.name || 'Untitled fund') + ': ' + fmtCents(c.monthly) + '/mo';
+        bar.appendChild(seg);
+      });
+      s.appendChild(bar);
+    }
+
+    const list = el('div', 'sum-rows');
+    rows.forEach(({ fund, c }) => {
+      const r = el('div', 'sum-row');
+      const d = el('span', 'dot'); d.style.background = fund.color;
+      const nm = el('span', 'nm', fund.name || 'Untitled fund');
+      nm.appendChild(el('small', '', c.goal > 0 ? `${fmt(c.goal)} goal${c.months ? ' · ' + c.months + ' mo' : ''}` : 'Not filled in yet'));
+      const v = el('span', 'val', fmtCents(c.monthly) + '/mo');
+      if (pay) v.appendChild(el('small', '', fmtCents(c.monthly * 12 / pay.per) + '/paycheck'));
+      r.append(d, nm, v);
+      list.appendChild(r);
+    });
+    s.appendChild(list);
+
+    const tip = el('div', 'sum-tip');
+    tip.appendChild(el('strong', '', 'Make it automatic. '));
+    tip.append('Set up a recurring transfer into a separate savings account on payday, so the money is set aside before it has a chance to get spent.');
+    s.appendChild(tip);
+
+    const reset = el('button', 'reset-btn', 'Start over');
+    reset.type = 'button';
+    reset.addEventListener('click', () => {
+      if (reset.dataset.confirm) {
+        state = { funds: [], nextColor: 0, nextId: 1, payFreq: state.payFreq };
+        save(); renderFunds(); update();
+      } else {
+        reset.dataset.confirm = '1';
+        reset.textContent = 'Click again to clear everything';
+        setTimeout(() => { if (reset.isConnected) { delete reset.dataset.confirm; reset.textContent = 'Start over'; } }, 3000);
+      }
+    });
+    s.appendChild(reset);
+  }
+
+  // ── Init ─────────────────────────────────────────────────────────────
+  renderChips();
+  renderFunds();
+  update();
+</script>
+
+</body>
+</html>
