@@ -1166,11 +1166,6 @@
     });
     s.appendChild(list);
 
-    const tip = el('div', 'sum-tip');
-    tip.appendChild(el('strong', '', 'Make it automatic. '));
-    tip.append('Set up a recurring transfer into a separate savings account on payday, so the money is set aside before it has a chance to get spent.');
-    s.appendChild(tip);
-
     const reset = el('button', 'reset-btn', 'Start over');
     reset.type = 'button';
     reset.addEventListener('click', () => {
