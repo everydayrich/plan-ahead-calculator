@@ -701,7 +701,7 @@
   <img class="hero-logo" src="everyday_rich_stacked_logo_rgb_red.png" alt="Everyday Rich" />
   <div class="hero-eyebrow">Plan Ahead Calculator</div>
   <h1>Plan for the big stuff <em>before</em> it shows up.</h1>
-  <p>A <strong>sinking fund</strong> is money you set aside a little at a time for an expense you know is coming, so the cash is ready when the bill shows up. <br>Gifts, vacations, home projects, kids' activities, continuing education, and home or vehicle maintenance. Enter your expenses and the calculator will tell you how much to set aside each month so the money is there when you need it.</p>
+  <p>A <strong>sinking fund</strong> is money you set aside a little at a time for an expense you know is coming, so the cash is ready when the bill shows up. <br>Gifts, vacations, home projects, kids' activities, pet care, continuing education, and home or vehicle maintenance. Pick what you're planning for, fill in a few details, and the calculator will tell you how much to set aside each month so the money is there when you need it.</p>
 </div>
 
 <div class="page">
@@ -819,6 +819,21 @@
       ],
       items: [],
     },
+    pets: {
+      name: 'Pet Care Fund',
+      chip: 'Pet Care Fund',
+      blurb: 'Checkups, prevention, grooming, and boarding, plus a cushion for the surprise vet visit.',
+      timing: 'Spread this over {months:n} months.',
+      months: 12,
+      sentences: [
+        { tpl: 'We have {pets:n} pets. Checkups and vaccines run about {cost:$} per pet each year.', calc: v => v.pets * v.cost },
+        { tpl: 'Flea, tick, and heartworm prevention costs about {cost:$} a year in total.', calc: v => v.cost },
+        { tpl: 'We get about {count:n} grooming visits a year at {cost:$} each.', calc: v => v.count * v.cost },
+        { tpl: 'Boarding or pet sitting runs about {nights:n} nights a year at {cost:$} a night.', calc: v => v.nights * v.cost },
+        { tpl: "I'd like {cost:$} set aside for surprise vet bills.", calc: v => v.cost },
+      ],
+      items: [],
+    },
     education: {
       name: 'Continuing Education Fund',
       chip: 'Continuing Education Fund',
@@ -835,7 +850,7 @@
     },
     custom: {
       name: '',
-      placeholder: 'Name your fund (e.g. Pet Care)',
+      placeholder: 'Name your fund (e.g. Back-to-School)',
       chip: 'Build Your Own Fund',
       blurb: 'Add each expense, how many times it happens, and what it usually costs.',
       timing: 'Spread this over {months:n} months.',
