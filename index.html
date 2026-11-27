@@ -1127,13 +1127,13 @@
       renderItems(fund, items);
       body.appendChild(items);
 
-      const add = el('button', 'add-item', fund.items.length || fund.type === 'custom' ? '+ Add an expense' : '+ Add something else to this fund');
+      const add = el('button', 'add-item', fund.items.length || fund.type === 'custom' ? '+ Add something else to this fund' : '+ Add something else to this fund');
       add.type = 'button';
       add.addEventListener('click', () => {
         fund.items.push({ label: '', qty: 1, cost: '' });
         save();
         renderItems(fund, items);
-        add.textContent = '+ Add an expense';
+        add.textContent = '+ Add something else to this fund';
         const labels = items.querySelectorAll('.item-label');
         if (labels.length) labels[labels.length - 1].focus();
         update();
@@ -1287,11 +1287,6 @@
       list.appendChild(r);
     });
     s.appendChild(list);
-
-    const tip = el('div', 'sum-tip');
-    tip.appendChild(el('strong', '', 'Make it automatic. '));
-    tip.append('Set up a recurring transfer into a separate savings account on payday, so the money is set aside before it has a chance to get spent.');
-    s.appendChild(tip);
 
     const exp = el('button', 'export-btn', 'Download my plan (Excel) \u2192');
     exp.type = 'button';
