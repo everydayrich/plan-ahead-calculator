@@ -731,9 +731,11 @@
 
   // ── Fund templates ───────────────────────────────────────────────────
   // Sentence tokens: {key:n} = number, {key:$} = dollars
+  // itemHint: example shown in the expense box when someone adds something else to the fund
   const TEMPLATES = {
     gifts: {
       name: 'Gift Fund',
+      itemHint: 'Anniversary gifts',
       chip: 'Gift Fund',
       blurb: 'Birthdays, holidays, and all the "we should bring something" moments in between.',
       timing: 'Spread this over {months:n} months.',
@@ -747,6 +749,7 @@
     },
     vacation: {
       name: 'Vacation Fund',
+      itemHint: 'Rental car',
       chip: 'Vacation Fund',
       blurb: 'Getting there, a place to stay, and enough left over to actually enjoy it.',
       timing: 'My trip is {months:n} months away.',
@@ -761,6 +764,7 @@
     },
     home: {
       name: 'Home Improvement Fund',
+      itemHint: 'Light fixtures',
       chip: 'Home Improvement Fund',
       blurb: 'List the pieces of the project. A cushion helps cover the surprises that always come up.',
       timing: 'I want to start in {months:n} months.',
@@ -775,6 +779,7 @@
     },
     homerepair: {
       name: 'Home Maintenance Fund',
+      itemHint: 'Gutter cleaning',
       chip: 'Home Maintenance Fund',
       blurb: 'Routine upkeep plus the leaky roof, the dead water heater, and the repairs no one plans for.',
       note: "<strong>Rule of thumb:</strong> set aside 1% to 4% of your home's value each year for maintenance and repairs, depending on its age: about 1% for homes under 10 years old, 2% at 10–20 years, 3% at 20–30 years, and 4% for homes 30+ years old. Choosing your home's age fills in a starting percent.<br><br><strong>Tough climate?</strong> Go one step higher if your area is hard on houses: freezing winters, high humidity or heavy rain, extreme heat, salty coastal air, or regular hurricanes or hail.",
@@ -793,6 +798,7 @@
     },
     vehicle: {
       name: 'Vehicle Maintenance Fund',
+      itemHint: 'New tires',
       chip: 'Vehicle Maintenance Fund',
       blurb: 'Oil changes and tires, plus the brakes, batteries, and check-engine lights that always come at the worst time.',
       note: "<strong>Rule of thumb:</strong> AAA puts average maintenance and repair costs at about 10¢ per mile, and recommends saving at least $50 a month per vehicle. The calculator uses whichever is higher. Older or higher-mileage vehicles usually cost more, so consider raising the per-mile amount if yours are getting up there.<br><br><strong>Good to know:</strong> if a single repair would cost more than about 70–80% of what a car is worth, insurers would consider it totaled. That's usually the point to put the money toward a replacement instead.",
@@ -810,6 +816,7 @@
     },
     kids: {
       name: "Kids' Activities Fund",
+      itemHint: 'Summer camp',
       chip: "Kids' Activities Fund",
       blurb: 'Sports, lessons, camps, and clubs, including registration fees, gear, and uniforms.',
       timing: 'Spread this over {months:n} months.',
@@ -821,6 +828,7 @@
     },
     pets: {
       name: 'Pet Care Fund',
+      itemHint: 'Dental cleaning',
       chip: 'Pet Care Fund',
       blurb: 'Checkups, prevention, grooming, and boarding, plus a cushion for the surprise vet visit.',
       timing: 'Spread this over {months:n} months.',
@@ -836,6 +844,7 @@
     },
     education: {
       name: 'Continuing Education Fund',
+      itemHint: 'Test prep course',
       chip: 'Continuing Education Fund',
       blurb: 'Courses, certifications, and the renewals that keep your credentials current.',
       timing: 'Spread this over {months:n} months.',
@@ -850,6 +859,7 @@
     },
     custom: {
       name: '',
+      itemHint: 'School supplies',
       placeholder: 'Name your fund (e.g. Back-to-School)',
       chip: 'Build Your Own Fund',
       blurb: 'Add each expense, how many times it happens, and what it usually costs.',
@@ -1036,7 +1046,7 @@
 
       const label = el('input', 'item-label');
       label.type = 'text';
-      label.placeholder = 'What is it? (e.g. Oil changes)';
+      label.placeholder = 'What is it? (e.g. ' + (TEMPLATES[fund.type].itemHint || 'Something else') + ')';
       label.value = it.label || '';
       label.setAttribute('aria-label', 'Expense name');
       label.addEventListener('input', () => { it.label = label.value; save(); });
