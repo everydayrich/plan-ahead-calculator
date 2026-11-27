@@ -91,6 +91,7 @@
     }
 
     .hero h1 em { font-style: italic; color: var(--terracotta); }
+    .hero p strong { color: var(--text); font-weight: 600; }
 
     .hero p {
       font-size: 1rem;
@@ -314,6 +315,23 @@
       border-color: var(--terracotta);
       box-shadow: 0 0 0 3px rgba(216,66,51,0.1);
     }
+
+    .inl-sel {
+      appearance: none;
+      -webkit-appearance: none;
+      background: var(--surface2) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23D84233' stroke-width='1.6'/%3E%3C/svg%3E") no-repeat right 0.6rem center;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0.3rem 1.8rem 0.3rem 0.6rem;
+      font-family: 'Lexend', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--terracotta);
+      line-height: 1.4;
+      cursor: pointer;
+    }
+    .inl-sel.unset { color: #b39d78; font-weight: 400; }
+    .inl-sel:focus { outline: none; border-color: var(--terracotta); box-shadow: 0 0 0 3px rgba(216,66,51,0.1); }
 
     .money { position: relative; display: inline-block; }
     .money .cur {
@@ -614,6 +632,36 @@
     }
     .sum-tip strong { color: var(--text); font-weight: 600; }
 
+    .export-btn {
+      display: block;
+      width: 100%;
+      margin-top: 1.25rem;
+      padding: 0.85rem;
+      background: var(--marigold);
+      color: var(--espresso);
+      border: none;
+      border-radius: var(--radius-pill);
+      font-family: 'Lexend', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+      box-shadow: 0 4px 20px rgba(235,149,50,0.25);
+    }
+    .export-btn:hover { background: #d6842c; box-shadow: 0 6px 28px rgba(235,149,50,0.32); }
+    .export-btn:active { transform: scale(0.98); }
+    .export-btn:disabled { opacity: 0.6; cursor: default; }
+
+    .export-msg {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.74rem;
+      color: var(--muted);
+      text-align: center;
+      margin-top: 0.5rem;
+      min-height: 1em;
+    }
+
     .reset-btn {
       display: block;
       margin: 1rem auto 0;
@@ -653,7 +701,7 @@
   <img class="hero-logo" src="everyday_rich_stacked_logo_rgb_red.png" alt="Everyday Rich" />
   <div class="hero-eyebrow">Plan Ahead Calculator</div>
   <h1>Plan for the big stuff <em>before</em> it shows up.</h1>
-  <p>Gifts, vacations, home projects, kids' activities, and home or vehicle repairs. Enter your expenses and the calculator will tell you how much to set aside each month so the money is there when you need it.</p>
+  <p>A <strong>sinking fund</strong> is money you set aside a little at a time for an expense you know is coming, so the cash is ready when the bill shows up. <br>Gifts, vacations, home projects, kids' activities, continuing education, and home or vehicle maintenance. Enter your expenses and the calculator will tell you how much to set aside each month so the money is there when you need it.</p>
 </div>
 
 <div class="page">
@@ -662,7 +710,7 @@
   <div>
     <div class="picker">
       <div class="section-label">Step 1</div>
-      <div class="picker-title">Add a sinking fund</div>
+      <div class="picker-title">Add something to plan for</div>
       <div class="picker-sub">Start with one of these, or build your own. You can add as many funds as you like.</div>
       <div class="chips" id="chips"></div>
     </div>
@@ -699,7 +747,7 @@
     },
     vacation: {
       name: 'Vacation Fund',
-      chip: 'Vacation',
+      chip: 'Vacation Fund',
       blurb: 'Getting there, a place to stay, and enough left over to actually enjoy it.',
       timing: 'My trip is {months:n} months away.',
       months: 12,
@@ -713,7 +761,7 @@
     },
     home: {
       name: 'Home Improvement Fund',
-      chip: 'Home Improvement',
+      chip: 'Home Improvement Fund',
       blurb: 'List the pieces of the project. A cushion helps cover the surprises that always come up.',
       timing: 'I want to start in {months:n} months.',
       months: 12,
@@ -726,32 +774,43 @@
       ],
     },
     homerepair: {
-      name: 'Home Repairs Fund',
-      chip: 'Home Repairs',
-      blurb: 'For the leaky roof, the dead water heater, and the repairs no one plans for.',
-      note: "<strong>Rule of thumb:</strong> set aside 1% to 4% of your home's value each year for maintenance and repairs. Lean toward 1% for homes under 10 years old and closer to 4% for homes over 30 years old or in harsh climates.",
+      name: 'Home Maintenance Fund',
+      chip: 'Home Maintenance Fund',
+      blurb: 'Routine upkeep plus the leaky roof, the dead water heater, and the repairs no one plans for.',
+      note: "<strong>Rule of thumb:</strong> set aside 1% to 4% of your home's value each year for maintenance and repairs, depending on its age: about 1% for homes under 10 years old, 2% at 10–20 years, 3% at 20–30 years, and 4% for homes 30+ years old. Choosing your home's age fills in a starting percent.<br><br><strong>Tough climate?</strong> Go one step higher if your area is hard on houses: freezing winters, high humidity or heavy rain, extreme heat, salty coastal air, or regular hurricanes or hail.",
       timing: 'Spread this over {months:n} months.',
       months: 12,
       sentences: [
-        { tpl: "My home is worth about {value:$}. I'll set aside {pct:n}% of its value each year.", calc: v => v.value * v.pct / 100, defaults: { pct: 1 } },
+        {
+          tpl: "My home is worth about {value:$} and is {age:sel} old, so I'll set aside {pct:n}% of its value each year.",
+          calc: v => v.value * v.pct / 100,
+          defaults: { pct: 1, age: '' },
+          selects: { age: [['', 'how'], ['lt10', 'less than 10 years'], ['10-20', '10–20 years'], ['20-30', '20–30 years'], ['30plus', '30+ years']] },
+          onSelect: { age: { lt10: { pct: 1 }, '10-20': { pct: 2 }, '20-30': { pct: 3 }, '30plus': { pct: 4 } } },
+        },
       ],
       items: [],
     },
     vehicle: {
-      name: 'Vehicle Repairs Fund',
-      chip: 'Vehicle Repairs',
-      blurb: 'Tires, brakes, batteries, and the check-engine light that always comes on at the worst time.',
-      note: "<strong>Rule of thumb:</strong> set aside 1% to 2% of your vehicles' value per year for maintenance and repairs. Older or higher-mileage vehicles usually need more, so consider going higher if yours are getting up there.",
+      name: 'Vehicle Maintenance Fund',
+      chip: 'Vehicle Maintenance Fund',
+      blurb: 'Oil changes and tires, plus the brakes, batteries, and check-engine lights that always come at the worst time.',
+      note: "<strong>Rule of thumb:</strong> AAA puts average maintenance and repair costs at about 10¢ per mile, and recommends saving at least $50 a month per vehicle. The calculator uses whichever is higher. Older or higher-mileage vehicles usually cost more, so consider raising the per-mile amount if yours are getting up there.<br><br><strong>Good to know:</strong> if a single repair would cost more than about 70–80% of what a car is worth, insurers would consider it totaled. That's usually the point to put the money toward a replacement instead.",
       timing: 'Spread this over {months:n} months.',
       months: 12,
       sentences: [
-        { tpl: "All of our vehicles together are worth about {value:$}. I'll set aside {pct:n}% of that each year.", calc: v => v.value * v.pct / 100, defaults: { pct: 2 } },
+        {
+          tpl: "We have {cars:n} vehicles and drive about {miles:n} miles a year in total. I'll set aside {cpm:n}¢ per mile.",
+          calc: v => v.miles > 0 ? Math.max(v.miles * v.cpm / 100, v.cars * 600) : 0,
+          suffix: v => (v.miles > 0 && v.cars * 600 > v.miles * v.cpm / 100) ? ' (AAA minimum)' : '',
+          defaults: { cars: 1, cpm: 10 },
+        },
       ],
       items: [],
     },
     kids: {
       name: "Kids' Activities Fund",
-      chip: "Kids' Activities",
+      chip: "Kids' Activities Fund",
       blurb: 'Sports, lessons, camps, and clubs, including registration fees, gear, and uniforms.',
       timing: 'Spread this over {months:n} months.',
       months: 12,
@@ -760,10 +819,24 @@
       ],
       items: [],
     },
+    education: {
+      name: 'Continuing Education Fund',
+      chip: 'Continuing Education Fund',
+      blurb: 'Courses, certifications, and the renewals that keep your credentials current.',
+      timing: 'Spread this over {months:n} months.',
+      months: 12,
+      sentences: [
+        { tpl: "I'm taking {count:n} courses or classes at about {cost:$} each.", calc: v => v.count * v.cost },
+        { tpl: 'I have {count:n} certification or exam fees at about {cost:$} each.', calc: v => v.count * v.cost },
+        { tpl: 'License renewals and membership dues run about {cost:$} a year.', calc: v => v.cost },
+        { tpl: 'Books, materials, or conference travel will cost about {cost:$}.', calc: v => v.cost },
+      ],
+      items: [],
+    },
     custom: {
       name: '',
-      placeholder: 'Name your fund (e.g. Car Repairs)',
-      chip: 'Build your own',
+      placeholder: 'Name your fund (e.g. Pet Care)',
+      chip: 'Build Your Own Fund',
       blurb: 'Add each expense, how many times it happens, and what it usually costs.',
       timing: 'Spread this over {months:n} months.',
       months: 12,
@@ -781,7 +854,7 @@
   };
 
   // ── State ────────────────────────────────────────────────────────────
-  const STORE_KEY = 'er-sinking-funds-v2';
+  const STORE_KEY = 'er-sinking-funds-v3';
   let state = { funds: [], nextColor: 0, nextId: 1 };
 
   try {
@@ -807,14 +880,38 @@
   }
 
   // Build a sentence with inline inputs. getVal/setVal read & write the backing store.
-  function buildSentence(tpl, getVal, setVal) {
+  function buildSentence(tpl, getVal, setVal, opts = {}) {
     const wrap = el('span', 'sentence');
-    const re = /\{(\w+):(n|\$)\}/g;
+    const re = /\{(\w+):(n|\$|sel)\}/g;
+    const inputs = {};
     let last = 0, m;
     while ((m = re.exec(tpl))) {
       if (m.index > last) wrap.appendChild(document.createTextNode(tpl.slice(last, m.index)));
       const key = m[1], kind = m[2];
+      if (kind === 'sel') {
+        const sel = el('select', 'inl-sel');
+        sel.setAttribute('aria-label', key);
+        (opts.selects && opts.selects[key] || []).forEach(([val, label]) => {
+          const o = el('option', '', label);
+          o.value = val;
+          if (val === '') o.disabled = true;
+          sel.appendChild(o);
+        });
+        sel.value = getVal(key) || '';
+        sel.classList.toggle('unset', !sel.value);
+        sel.addEventListener('change', () => {
+          setVal(key, sel.value);
+          sel.classList.toggle('unset', !sel.value);
+          const patch = opts.onSelect && opts.onSelect[key] && opts.onSelect[key][sel.value];
+          if (patch) Object.entries(patch).forEach(([k, v]) => { setVal(k, v); if (inputs[k]) inputs[k].value = v; });
+          update();
+        });
+        wrap.appendChild(sel);
+        last = re.lastIndex;
+        continue;
+      }
       const input = el('input', 'inl');
+      inputs[key] = input;
       input.type = 'number';
       input.min = '0';
       input.step = 'any';
@@ -839,12 +936,16 @@
   }
 
   // ── Calculations ─────────────────────────────────────────────────────
-  function sentenceTotal(fund, i) {
+  function sentenceVals(fund, i) {
     const t = TEMPLATES[fund.type].sentences[i];
     const raw = fund.sentences[i] || {};
     const v = {};
     (t.tpl.match(/\{(\w+):/g) || []).forEach(k => { const key = k.slice(1, -1); v[key] = num(raw[key]); });
-    return t.calc(v);
+    return v;
+  }
+
+  function sentenceTotal(fund, i) {
+    return TEMPLATES[fund.type].sentences[i].calc(sentenceVals(fund, i));
   }
 
   function fundCalc(fund) {
@@ -998,7 +1099,8 @@
         const line = el('div', 'line');
         line.appendChild(buildSentence(s.tpl,
           k => fund.sentences[i][k],
-          (k, v) => { fund.sentences[i][k] = v; }));
+          (k, v) => { fund.sentences[i][k] = v; },
+          { selects: s.selects, onSelect: s.onSelect }));
         const lt = el('span', 'line-total');
         lt.dataset.fund = fund.id;
         lt.dataset.line = i;
@@ -1059,7 +1161,11 @@
       // per-line totals
       TEMPLATES[fund.type].sentences.forEach((_, i) => {
         const lt = document.querySelector(`.line-total[data-fund="${fund.id}"][data-line="${i}"]`);
-        if (lt) { const v = sentenceTotal(fund, i); lt.textContent = v > 0 ? '= ' + fmt(v) : ''; }
+        if (lt) {
+          const t = TEMPLATES[fund.type].sentences[i];
+          const v = sentenceTotal(fund, i);
+          lt.textContent = v > 0 ? '= ' + fmt(v) + (t.suffix ? t.suffix(sentenceVals(fund, i)) : '') : '';
+        }
       });
 
       const g = document.querySelector(`[data-goal="${fund.id}"]`);
@@ -1087,6 +1193,7 @@
     });
 
     renderSummary(rows, totalMonthly, totalGoal);
+    saveShared();
   }
 
   function renderSummary(rows, totalMonthly, totalGoal) {
@@ -1099,7 +1206,7 @@
     s.appendChild(el('div', 'sum-total', fmtCents(totalMonthly)));
 
     if (!rows.length) {
-      s.appendChild(el('div', 'sum-total-sub', 'across your sinking funds'));
+      s.appendChild(el('div', 'sum-total-sub', 'across your funds'));
       const empty = el('div', 'sum-empty');
       empty.style.marginTop = '1.5rem';
       empty.appendChild(el('div', 'icon', '◎'));
@@ -1108,7 +1215,7 @@
       return;
     }
 
-    s.appendChild(el('div', 'sum-total-sub', `across ${rows.length} sinking fund${rows.length === 1 ? '' : 's'}`));
+    s.appendChild(el('div', 'sum-total-sub', `across ${rows.length} fund${rows.length === 1 ? '' : 's'}`));
 
     // pay schedule question
     const q = el('label', 'pay-q');
@@ -1166,6 +1273,17 @@
     });
     s.appendChild(list);
 
+    const tip = el('div', 'sum-tip');
+    tip.appendChild(el('strong', '', 'Make it automatic. '));
+    tip.append('Set up a recurring transfer into a separate savings account on payday, so the money is set aside before it has a chance to get spent.');
+    s.appendChild(tip);
+
+    const exp = el('button', 'export-btn', 'Download my plan (Excel) \u2192');
+    exp.type = 'button';
+    const expMsg = el('div', 'export-msg');
+    exp.addEventListener('click', () => downloadExcel(exp, expMsg));
+    s.append(exp, expMsg);
+
     const reset = el('button', 'reset-btn', 'Start over');
     reset.type = 'button';
     reset.addEventListener('click', () => {
@@ -1179,6 +1297,194 @@
       }
     });
     s.appendChild(reset);
+  }
+
+  // ── Shared results (lets other Everyday Rich tools on this site compile one family budget) ──
+  // Stored under one key per browser; each tool writes its own entry.
+  const SHARED_KEY = 'everyday-rich-results';
+  function saveShared() {
+    try {
+      const all = JSON.parse(localStorage.getItem(SHARED_KEY) || '{}');
+      const pay = PAY[state.payFreq];
+      let total = 0;
+      const funds = state.funds.map(f => {
+        const c = fundCalc(f);
+        total += c.monthly;
+        return { name: f.name || 'Untitled fund', goal: Math.round(c.goal), saved: num(f.saved), months: c.months, monthly: Math.ceil(c.monthly - 1e-9) };
+      });
+      all['plan-ahead'] = {
+        tool: 'Plan Ahead Calculator',
+        updated: new Date().toISOString(),
+        paySchedule: pay ? pay.label : null,
+        paychecksPerYear: pay ? pay.per : null,
+        monthlyTotal: Math.ceil(total - 1e-9),
+        funds,
+      };
+      localStorage.setItem(SHARED_KEY, JSON.stringify(all));
+    } catch (e) {}
+  }
+
+  // ── Excel export ──
+  const EXCELJS_URL = 'https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js';
+  function loadExcelJS() {
+    if (window.ExcelJS) return Promise.resolve();
+    return new Promise((resolve, reject) => {
+      const sc = document.createElement('script');
+      sc.src = EXCELJS_URL;
+      sc.onload = resolve;
+      sc.onerror = () => reject(new Error('load'));
+      document.head.appendChild(sc);
+    });
+  }
+
+  // Turn a template sentence into plain text with the person's numbers filled in
+  function fillSentence(tpl, raw, selects) {
+    return tpl.replace(/\{(\w+):(n|\$|sel)\}/g, (_, key, kind) => {
+      const val = raw[key];
+      if (kind === 'sel') {
+        const opt = (selects && selects[key] || []).find(o => o[0] === val);
+        return opt && val ? opt[1] : '___';
+      }
+      if (val === '' || val == null) return kind === '$' ? '$___' : '___';
+      return (kind === '$' ? '$' : '') + Number(val).toLocaleString();
+    });
+  }
+
+  async function downloadExcel(btn, msg) {
+    btn.disabled = true;
+    msg.textContent = 'Building your spreadsheet…';
+    try {
+      await loadExcelJS();
+      const wb = new ExcelJS.Workbook();
+      wb.creator = 'Everyday Rich';
+      wb.calcProperties.fullCalcOnLoad = true;
+
+      const RED = 'FFD84233', CREAM = 'FFFBF3E4', BORDER = 'FFE5D3B4', INK = 'FF1F2427', MUTED = 'FF5E7A78';
+      const money = '"$"#,##0';
+      const headStyle = cell => {
+        cell.font = { bold: true, color: { argb: INK }, name: 'Calibri', size: 11 };
+        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: CREAM } };
+        cell.border = { bottom: { style: 'thin', color: { argb: BORDER } } };
+        cell.alignment = { vertical: 'middle', wrapText: true };
+      };
+
+      // unique fund labels so formulas can match them
+      const seen = {};
+      const funds = state.funds.map(f => {
+        let label = (f.name || 'Untitled fund').trim() || 'Untitled fund';
+        seen[label] = (seen[label] || 0) + 1;
+        if (seen[label] > 1) label += ' (' + seen[label] + ')';
+        return { f, label, c: fundCalc(f) };
+      });
+
+      // ── Fund Details tab ──
+      const sum = wb.addWorksheet('Summary');
+      const det = wb.addWorksheet('Fund Details');
+
+      det.columns = [
+        { header: 'Fund', key: 'fund', width: 30 },
+        { header: 'Expense', key: 'exp', width: 80 },
+        { header: 'Yearly / total cost', key: 'amt', width: 18 },
+      ];
+      det.getRow(1).eachCell(headStyle);
+      funds.forEach(({ f, label }) => {
+        const t = TEMPLATES[f.type];
+        t.sentences.forEach((sen, i) => {
+          const amt = sentenceTotal(f, i);
+          if (amt <= 0) return;
+          const suffix = sen.suffix ? sen.suffix(sentenceVals(f, i)) : '';
+          det.addRow({ fund: label, exp: fillSentence(sen.tpl, f.sentences[i] || {}, sen.selects) + suffix, amt: Math.round(amt * 100) / 100 });
+        });
+        f.items.forEach(it => {
+          const amt = num(it.qty) * num(it.cost);
+          if (amt <= 0) return;
+          det.addRow({ fund: label, exp: `${it.label || 'Expense'} (${num(it.qty)} × $${num(it.cost).toLocaleString()})`, amt });
+        });
+      });
+      det.getColumn('amt').numFmt = money;
+      det.getColumn('exp').alignment = { wrapText: true, vertical: 'top' };
+      det.views = [{ state: 'frozen', ySplit: 1 }];
+
+      // ── Sheet 1: summary ──
+      const pay = PAY[state.payFreq];
+      sum.getColumn(1).width = 32;
+      [18, 12, 16, 14, 16, 18, 16].forEach((w, i) => sum.getColumn(i + 2).width = w);
+
+      sum.getCell('A1').value = 'Everyday Rich · Plan Ahead Calculator';
+      sum.getCell('A1').font = { bold: true, size: 16, color: { argb: RED } };
+      sum.getCell('A2').value = 'Created ' + new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+      sum.getCell('A2').font = { italic: true, color: { argb: MUTED } };
+
+      sum.getCell('A4').value = 'Paychecks per year';
+      sum.getCell('A4').font = { bold: true };
+      sum.getCell('B4').value = pay ? pay.per : 26;
+      sum.getCell('B4').fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: CREAM } };
+      sum.getCell('C4').value = pay
+        ? `(${pay.label.toLowerCase()}; weekly = 52, every two weeks = 26, twice a month = 24, monthly = 12)`
+        : '(assumed every two weeks; change to 52, 24, or 12 to match your pay schedule)';
+      sum.getCell('C4').font = { italic: true, color: { argb: MUTED } };
+
+      const H = 6;
+      ['Fund', 'Yearly / total cost', 'Cushion', 'Already saved', 'Months to save', 'Goal', 'Set aside each month', 'Per paycheck']
+        .forEach((h, i) => { const c = sum.getCell(H, i + 1); c.value = h; headStyle(c); });
+      sum.getRow(H).height = 30;
+
+      let r = H + 1;
+      funds.forEach(({ f, label, c }) => {
+        const base = Math.round(c.base * 100) / 100;
+        const cushion = num(f.cushion) / 100;
+        const saved = num(f.saved);
+        const goal = base * (1 + cushion);
+        const monthly = c.months > 0 ? Math.max(0, Math.ceil((goal - saved) / c.months - 1e-9)) : 0;
+        const per = pay ? pay.per : 26;
+        sum.getCell(r, 1).value = label;
+        sum.getCell(r, 2).value = { formula: `SUMIF('Fund Details'!$A:$A,A${r},'Fund Details'!$C:$C)`, result: base };
+        sum.getCell(r, 3).value = cushion;
+        sum.getCell(r, 4).value = saved;
+        sum.getCell(r, 5).value = c.months;
+        sum.getCell(r, 6).value = { formula: `B${r}*(1+C${r})`, result: goal };
+        sum.getCell(r, 7).value = { formula: `IF(E${r}>0,MAX(0,ROUNDUP((F${r}-D${r})/E${r},0)),0)`, result: monthly };
+        sum.getCell(r, 8).value = { formula: `ROUNDUP(G${r}*12/$B$4,0)`, result: Math.ceil(monthly * 12 / per - 1e-9) };
+        r++;
+      });
+      const last = r - 1;
+      sum.getCell(r, 1).value = 'Total';
+      [[6, 'F'], [7, 'G']].forEach(([col, L]) => {
+        let res = 0;
+        for (let k = H + 1; k <= last; k++) res += Number((sum.getCell(k, col).value || {}).result || 0);
+        sum.getCell(r, col).value = { formula: `SUM(${L}${H + 1}:${L}${last})`, result: res };
+      });
+      const totMonthly = Number(sum.getCell(r, 7).value.result || 0);
+      sum.getCell(r, 8).value = { formula: `ROUNDUP(G${r}*12/$B$4,0)`, result: Math.ceil(totMonthly * 12 / (pay ? pay.per : 26) - 1e-9) };
+      sum.getRow(r).eachCell(cell => {
+        cell.font = { bold: true, color: { argb: RED } };
+        cell.border = { top: { style: 'medium', color: { argb: BORDER } } };
+      });
+      [2, 4, 6, 7, 8].forEach(col => sum.getColumn(col).numFmt = money);
+      sum.getColumn(3).numFmt = '0%';
+
+      sum.getCell(r + 2, 1).value = 'Tip: edit the amounts on the Fund Details tab, or the cushion, savings, and months here. Everything recalculates.';
+      sum.getCell(r + 2, 1).font = { italic: true, color: { argb: MUTED } };
+      sum.getCell(r + 3, 1).value = 'This calculator is for educational purposes only and does not constitute financial advice.';
+      sum.getCell(r + 3, 1).font = { italic: true, size: 9, color: { argb: MUTED } };
+      sum.views = [{ state: 'frozen', ySplit: H }];
+
+      const buf = await wb.xlsx.writeBuffer();
+      const blob = new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'everyday-rich-plan-ahead.xlsx';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 4000);
+      msg.textContent = 'Your spreadsheet is downloading.';
+    } catch (e) {
+      msg.textContent = 'Sorry, the download didn’t work. Please check your connection and try again.';
+    } finally {
+      btn.disabled = false;
+    }
   }
 
   // ── Init ─────────────────────────────────────────────────────────────
